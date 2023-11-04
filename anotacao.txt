@@ -1,0 +1,6 @@
+Atuador = lampada
+Sensor = luminosidade
+MQTT = faz intermediação entre atuador, sensor e controlador
+Controlador = permitir que o cliente tenha acesso e possa comandar o atuador e armazena nos bancos de dados. De acordo com as inormações que o
+sensor publicar no MQTT, o controlador vai tomar uma decisão e vai publicar no MQTT para o atuador
+Usuário = tem acesso ao controlador
