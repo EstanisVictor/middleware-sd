@@ -10,7 +10,7 @@ SENSOR = "/Sensor"
 ATUADOR = "/Atuador"
 
 
-class Controller(rpyc.Service):
+class Controller2(rpyc.Service):
     def __init__(self):
         self.broker = mqtt.Client()
         self.broker.on_connect = self.on_connect_mqtt
@@ -43,21 +43,21 @@ class Controller(rpyc.Service):
             if int(mensagemSensor[1]) <= 40:
                 self.broker.publish(TOPIC_CONTROLLER, "on".encode())
                 print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada")
-                with open("log.txt", "a") as file:
+                with open("../log.txt", "a") as file:
                     file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada\n")
             else:
                 self.broker.publish(TOPIC_CONTROLLER, "off".encode())
                 print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada")
-                with open("log.txt", "a") as file:
+                with open("../log.txt", "a") as file:
                     file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada\n")
         elif message.topic == ATUADOR:
             mensagemAtuador = message.payload.decode()
             print(f"Atuador: {mensagemAtuador}")
-            with open("log.txt", "a") as file:
+            with open("../log.txt", "a") as file:
                 file.write(f"Atuador: {mensagemAtuador}\n")
 
     def exposed_monitorar(self):
-        with open("log.txt", "r") as file:
+        with open("../log.txt", "r") as file:
             return file.read()
 
     def exposed_rpc_method(self, arg1, arg2):
@@ -69,10 +69,10 @@ class Controller(rpyc.Service):
 
     def start_rpc_server(self):
         from rpyc.utils.server import ThreadedServer
-        t = ThreadedServer(Controller, port=18861)
+        t = ThreadedServer(Controller2, port=18862)
         t.start()
 
 if __name__ == '__main__':
-    atuador = Controller()
+    atuador = Controller2()
     atuador.start_mqtt_loop()
     atuador.start_rpc_server()

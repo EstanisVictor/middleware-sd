@@ -1,5 +1,4 @@
 import time
-
 import rpyc
 
 class Client:
@@ -7,6 +6,9 @@ class Client:
         self.proxy = None
         self.name = name
         self.id_client = None
+
+    def conectar_controller(self):
+        return self.proxy.root.conectar_controller()
 
     def join_system(self, host, port):
         self.proxy = rpyc.connect(host, port, config={'allow_public_attrs': True})
@@ -38,25 +40,40 @@ def menu(client: Client):
 
 
 def main(client: Client):
-    while True:
+    try:
+        while client.conectar_controller():
+            print("Conectado ao Controller")
+            while True:
+                op = menu(client)
+                try:
+                    if op == '1':
+                        print("Precione CTRL+C para sair do monitoramento")
+                        try:
+                            while True:
+                                print(client.monitorar())
+                                time.sleep(1)
+                        except KeyboardInterrupt:
+                            with open("log.txt", "w") as file:
+                                file.write("")
+                            pass
+                    elif op == '2':
+                        print("Saindo do chat")
+                        break
+                except Exception as ex:
+                    print(ex)
+                    break
+        print("Controller não está disponível")
+    except Exception as ex:
+        print("Controller não está disponível")
+        print(ex)
+        exit(0)
 
-        op = menu(client)
 
-        if op == '1':
-            print("Precione CTRL+C para sair do monitoramento")
-            try:
-                while True:
-                    print(client.monitorar())
-                    time.sleep(1)
-            except KeyboardInterrupt:
-                with open("log.txt", "w") as file:
-                    file.write("")
-                pass
 
 if __name__ == '__main__':
     name = input('Digite seu nome: ')
 
     client = Client(name)
-    client.join_system('localhost', 18861)
+    client.join_system('localhost', 18860)
 
     main(client)
