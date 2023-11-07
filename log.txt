@@ -1,0 +1,6 @@
+Hora: 15:00 | Luminosidade: 55% desligada
+Atuador: desligada
+Hora: 16:00 | Luminosidade: 50% desligada
+Atuador: desligada
+Hora: 17:00 | Luminosidade: 45% desligada
+Atuador: desligada
