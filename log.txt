@@ -1,0 +1,174 @@
+Hora: 14:00 | Luminosidade: 60% desligada
+Atuador: desligada
+Hora: 15:00 | Luminosidade: 55% desligada
+Atuador: desligada
+Hora: 16:00 | Luminosidade: 50% desligada
+Atuador: desligada
+Hora: 17:00 | Luminosidade: 45% desligada
+Atuador: desligada
+Hora: 18:00 | Luminosidade: 40% ligada
+Atuador: ligada
+Hora: 19:00 | Luminosidade: 35% ligada
+Atuador: ligada
+Hora: 20:00 | Luminosidade: 30% ligada
+Atuador: ligada
+Hora: 21:00 | Luminosidade: 25% ligada
+Atuador: ligada
+Hora: 22:00 | Luminosidade: 20% ligada
+Atuador: ligada
+Hora: 23:00 | Luminosidade: 15% ligada
+Atuador: ligada
+Hora: 00:00 | Luminosidade: 10% ligada
+Atuador: ligada
+Hora: 1:00 | Luminosidade: 5% ligada
+Atuador: ligada
+Hora: 2:00 | Luminosidade: 0% ligada
+Atuador: ligada
+Hora: 3:00 | Luminosidade: 15% ligada
+Atuador: ligada
+Hora: 4:00 | Luminosidade: 35% ligada
+Atuador: ligada
+Hora: 5:00 | Luminosidade: 60% desligada
+Atuador: desligada
+Hora: 6:00 | Luminosidade: 100% desligada
+Atuador: desligada
+Hora: 7:00 | Luminosidade: 95% desligada
+Atuador: desligada
+Hora: 8:00 | Luminosidade: 90% desligada
+Atuador: desligada
+Hora: 9:00 | Luminosidade: 85% desligada
+Atuador: desligada
+Hora: 10:00 | Luminosidade: 80% desligada
+Atuador: desligada
+Hora: 11:00 | Luminosidade: 75% desligada
+Atuador: desligada
+Hora: 12:00 | Luminosidade: 70% desligada
+Atuador: desligada
+Hora: 13:00 | Luminosidade: 65% desligada
+Atuador: desligada
+Hora: 14:00 | Luminosidade: 60% desligada
+Atuador: desligada
+Hora: 15:00 | Luminosidade: 55% desligada
+Atuador: desligada
+Hora: 16:00 | Luminosidade: 50% desligada
+Atuador: desligada
+Hora: 17:00 | Luminosidade: 45% desligada
+Atuador: desligada
+Hora: 18:00 | Luminosidade: 40% ligada
+Atuador: ligada
+Hora: 19:00 | Luminosidade: 35% ligada
+Atuador: ligada
+Hora: 20:00 | Luminosidade: 30% ligada
+Atuador: ligada
+Hora: 21:00 | Luminosidade: 25% ligada
+Atuador: ligada
+Hora: 22:00 | Luminosidade: 20% ligada
+Atuador: ligada
+Hora: 23:00 | Luminosidade: 15% ligada
+Atuador: ligada
+Hora: 00:00 | Luminosidade: 10% ligada
+Atuador: ligada
+Hora: 1:00 | Luminosidade: 5% ligada
+Atuador: ligada
+Hora: 2:00 | Luminosidade: 0% ligada
+Atuador: ligada
+Hora: 3:00 | Luminosidade: 15% ligada
+Atuador: ligada
+Hora: 4:00 | Luminosidade: 35% ligada
+Atuador: ligada
+Hora: 5:00 | Luminosidade: 60% desligada
+Atuador: desligada
+Hora: 6:00 | Luminosidade: 100% desligada
+Atuador: desligada
+Hora: 7:00 | Luminosidade: 95% desligada
+Atuador: desligada
+Hora: 8:00 | Luminosidade: 90% desligada
+Atuador: desligada
+Hora: 9:00 | Luminosidade: 85% desligada
+Atuador: desligada
+Hora: 10:00 | Luminosidade: 80% desligada
+Atuador: desligada
+Hora: 11:00 | Luminosidade: 75% desligada
+Atuador: desligada
+Hora: 12:00 | Luminosidade: 70% desligada
+Atuador: desligada
+Hora: 13:00 | Luminosidade: 65% desligada
+Atuador: desligada
+Hora: 14:00 | Luminosidade: 60% desligada
+Atuador: desligada
+Hora: 15:00 | Luminosidade: 55% desligada
+Atuador: desligada
+Hora: 16:00 | Luminosidade: 50% desligada
+Atuador: desligada
+Hora: 17:00 | Luminosidade: 45% desligada
+Atuador: desligada
+Hora: 18:00 | Luminosidade: 40% ligada
+Atuador: ligada
+Hora: 19:00 | Luminosidade: 35% ligada
+Atuador: ligada
+Hora: 20:00 | Luminosidade: 30% ligada
+Atuador: ligada
+Hora: 21:00 | Luminosidade: 25% ligada
+Atuador: ligada
+Hora: 22:00 | Luminosidade: 20% ligada
+Atuador: ligada
+Hora: 23:00 | Luminosidade: 15% ligada
+Atuador: ligada
+Hora: 00:00 | Luminosidade: 10% ligada
+Atuador: ligada
+Hora: 1:00 | Luminosidade: 5% ligada
+Atuador: ligada
+Hora: 2:00 | Luminosidade: 0% ligada
+Atuador: ligada
+Hora: 3:00 | Luminosidade: 15% ligada
+Atuador: ligada
+Hora: 4:00 | Luminosidade: 35% ligada
+Atuador: ligada
+Hora: 5:00 | Luminosidade: 60% desligada
+Atuador: desligada
+Hora: 6:00 | Luminosidade: 100% desligada
+Atuador: desligada
+Hora: 7:00 | Luminosidade: 95% desligada
+Atuador: desligada
+Hora: 8:00 | Luminosidade: 90% desligada
+Atuador: desligada
+Hora: 9:00 | Luminosidade: 85% desligada
+Atuador: desligada
+Hora: 10:00 | Luminosidade: 80% desligada
+Atuador: desligada
+Hora: 11:00 | Luminosidade: 75% desligada
+Atuador: desligada
+Hora: 12:00 | Luminosidade: 70% desligada
+Atuador: desligada
+Hora: 13:00 | Luminosidade: 65% desligada
+Atuador: desligada
+Hora: 14:00 | Luminosidade: 60% desligada
+Atuador: desligada
+Hora: 15:00 | Luminosidade: 55% desligada
+Atuador: desligada
+Hora: 16:00 | Luminosidade: 50% desligada
+Atuador: desligada
+Hora: 17:00 | Luminosidade: 45% desligada
+Atuador: desligada
+Hora: 18:00 | Luminosidade: 40% ligada
+Atuador: ligada
+Hora: 19:00 | Luminosidade: 35% ligada
+Atuador: ligada
+Hora: 20:00 | Luminosidade: 30% ligada
+Atuador: ligada
+Hora: 21:00 | Luminosidade: 25% ligada
+Atuador: ligada
+Hora: 22:00 | Luminosidade: 20% ligada
+Atuador: ligada
+Hora: 23:00 | Luminosidade: 15% ligada
+Atuador: ligada
+Hora: 00:00 | Luminosidade: 10% ligada
+Atuador: ligada
+Hora: 1:00 | Luminosidade: 5% ligada
+Atuador: ligada
+Hora: 2:00 | Luminosidade: 0% ligada
+Atuador: ligada
+Hora: 3:00 | Luminosidade: 15% ligada
+Atuador: ligada
+Hora: 4:00 | Luminosidade: 35% ligada
+Atuador: ligada

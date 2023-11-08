@@ -8,7 +8,7 @@ MQTT_BROKER_PORT = 1883
 TOPIC_CONTROLLER = "/Controller"
 SENSOR = "/Sensor"
 ATUADOR = "/Atuador"
-
+comandoCliente = ""
 
 class Controller1(rpyc.Service):
     def __init__(self):
@@ -36,23 +36,54 @@ class Controller1(rpyc.Service):
             print(f"Erro de conexão MQTT: {rc}")
 
     def on_message_mqtt(self, client, userdata, message):
-        if message.topic == SENSOR:
-            mensagemSensor = message.payload.decode().split("/")
-            if int(mensagemSensor[1]) <= 40:
+        global comandoCliente
+        if comandoCliente == "":
+            if message.topic == SENSOR:
+                mensagemSensor = message.payload.decode().split("/")
+                if int(mensagemSensor[1]) <= 40:
+                    self.broker.publish(TOPIC_CONTROLLER, "on".encode())
+                    print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada")
+                    with open("../log.txt", "a") as file:
+                        file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada\n")
+                else:
+                    self.broker.publish(TOPIC_CONTROLLER, "off".encode())
+                    print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada")
+                    with open("../log.txt", "a") as file:
+                        file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada\n")
+            elif message.topic == ATUADOR:
+                mensagemAtuador = message.payload.decode()
+                print(f"Atuador: {mensagemAtuador}")
+                with open("../log.txt", "a") as file:
+                    file.write(f"Atuador: {mensagemAtuador}\n")
+
+        elif comandoCliente == "on":
+            if message.topic == SENSOR:
                 self.broker.publish(TOPIC_CONTROLLER, "on".encode())
-                print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada")
-                with open("../log.txt", "a") as file:
-                    file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada\n")
-            else:
+                mensagemSensor = message.payload.decode().split("/")
+                if int(mensagemSensor[1]) == 100:
+                    comandoCliente = ""
+                    self.broker.publish(TOPIC_CONTROLLER, "off".encode())
+                    print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada")
+                else:
+                    print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada")
+            elif message.topic == ATUADOR:
+                mensagemAtuador = message.payload.decode()
+                print(f"Atuador: {mensagemAtuador}")
+
+        elif comandoCliente == "off":
+            if message.topic == SENSOR:
                 self.broker.publish(TOPIC_CONTROLLER, "off".encode())
+                mensagemSensor = message.payload.decode().split("/")
                 print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada")
-                with open("../log.txt", "a") as file:
-                    file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada\n")
-        elif message.topic == ATUADOR:
-            mensagemAtuador = message.payload.decode()
-            print(f"Atuador: {mensagemAtuador}")
-            with open("../log.txt", "a") as file:
-                file.write(f"Atuador: {mensagemAtuador}\n")
+                if int(mensagemSensor[1]) == 35:
+                    comandoCliente = ""
+            elif message.topic == ATUADOR:
+                mensagemAtuador = message.payload.decode()
+                print(f"Atuador: {mensagemAtuador}")
+    def exposed_ligar_desligar_lampada(self, comando):
+        global comandoCliente
+        comandoCliente = comando
+        print(f"Comando: {comandoCliente}")
 
     def exposed_conectar_mqtt(self): #Método que faz o controller se conectar ao broker
         self.broker.connect(MQTT_BROKER_HOST, MQTT_BROKER_PORT)
@@ -61,10 +92,6 @@ class Controller1(rpyc.Service):
     def exposed_monitorar(self):
         with open("../log.txt", "r") as file:
             return file.read()
-
-    def exposed_rpc_method(self, arg1, arg2):
-        # Lógica para operações RPC
-        pass
 
     def start_mqtt_loop(self):
         self.broker.loop_start()

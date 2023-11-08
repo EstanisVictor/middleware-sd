@@ -17,15 +17,11 @@ class Client:
         self.proxy = rpyc.connect(host, port, config={'allow_public_attrs': True})
         self.id_client = self.proxy.root.join_system(self.name)
 
+    def ligar_desligar_lampada(self, comando):
+        return self.proxy.root.ligar_desligar_lampada(comando)
+
     def monitorar(self):
         return self.proxy.root.monitorar()
-
-    def send_message(self, room_name, message):
-        try:
-            return self.proxy.root.send_message(self.id_client, room_name, message)
-        except Exception as e:
-            print(e)
-            exit(0)
 
 def menu(client: Client):
     # limpar_console()
@@ -64,6 +60,9 @@ def main(client: Client):
                         elif op == '2':
                             print("Saindo do chat")
                             break
+                        elif op == '3':
+                            comando = input('Digite o comando: ')
+                            client.ligar_desligar_lampada(comando)
                     except Exception as ex:
                         print(ex)
                         break

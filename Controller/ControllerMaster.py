@@ -27,6 +27,13 @@ class ControllerMaster(rpyc.Service):
                 return True
             else:
                 return False
+
+    def ligar_desligar_lampada(self, comando): #Para acessar os controllers
+        return self.proxy.root.ligar_desligar_lampada(comando)
+
+    def exposed_ligar_desligar_lampada(self, comando):
+        return self.ligar_desligar_lampada(comando)
+
     def monitorar(self): #Para acessar os controllers
         return self.proxy.root.monitorar()
 
