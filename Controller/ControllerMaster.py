@@ -11,7 +11,11 @@ class ControllerMaster(rpyc.Service):
         user_id = uuid.uuid4()
         return str(user_id)
 
-    def exposed_conectar_controller(self):
+    def exposed_join_controller(self): #Função para conectar ao controller
+        self.proxy = rpyc.connect(self.host, self.controllerPort)
+        self.conectar_mqtt()
+        return True
+    def exposed_verifica_conexao_controller(self):
         self.controllerPort = 18861
         if self.verifica_conexao_server(self.host, self.controllerPort):  # Checando primeiro controller
             print("Conectado ao controller 1")
@@ -27,7 +31,7 @@ class ControllerMaster(rpyc.Service):
         return self.proxy.root.monitorar()
 
     def exposed_monitorar(self): #Para responder ao cliente
-        print()
+        return self.monitorar()
     def verifica_conexao_server(self, host, port):
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -36,9 +40,11 @@ class ControllerMaster(rpyc.Service):
             return True
         except (ConnectionRefusedError, socket.timeout):
             return False
-
+    def conectar_mqtt(self): #Decide qual controller vai publicar e assinar os tópicos
+        return self.proxy.root.conectar_mqtt()
 
 if __name__ == '__main__':
+    print("Iniciando Controller Master")
     from rpyc.utils.server import ThreadedServer
-    t = ThreadedServer(ControllerMaster, port=18860)
+    t = ThreadedServer(ControllerMaster, port=18850)
     t.start()

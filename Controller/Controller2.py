@@ -15,7 +15,6 @@ class Controller2(rpyc.Service):
         self.broker = mqtt.Client()
         self.broker.on_connect = self.on_connect_mqtt
         self.broker.on_message = self.on_message_mqtt
-        self.broker.connect(MQTT_BROKER_HOST, MQTT_BROKER_PORT)
         self.conn = None
         self.messageCLientMonitorar = None
 
@@ -37,7 +36,6 @@ class Controller2(rpyc.Service):
             print(f"Erro de conexão MQTT: {rc}")
 
     def on_message_mqtt(self, client, userdata, message):
-
         if message.topic == SENSOR:
             mensagemSensor = message.payload.decode().split("/")
             if int(mensagemSensor[1]) <= 40:
@@ -56,6 +54,10 @@ class Controller2(rpyc.Service):
             with open("../log.txt", "a") as file:
                 file.write(f"Atuador: {mensagemAtuador}\n")
 
+    def exposed_conectar_mqtt(self): #Método que faz o controller se conectar ao broker
+        self.broker.connect(MQTT_BROKER_HOST, MQTT_BROKER_PORT)
+        self.start_mqtt_loop()
+
     def exposed_monitorar(self):
         with open("../log.txt", "r") as file:
             return file.read()
@@ -73,6 +75,6 @@ class Controller2(rpyc.Service):
         t.start()
 
 if __name__ == '__main__':
+
     atuador = Controller2()
-    atuador.start_mqtt_loop()
     atuador.start_rpc_server()
