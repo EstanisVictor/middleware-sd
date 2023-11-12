@@ -74,9 +74,9 @@ class Controller1(rpyc.Service):
                     #     file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada\n")
             elif message.topic == ATUADOR:
                 mensagemAtuador = message.payload.decode()
-                print(f"Atuador: {mensagemAtuador}")
-                data = f"Atuador: {mensagemAtuador}\n"
-                self.save_data({"Atuador": self.encrypt_data(data)})
+                print(f"Lâmpada: {mensagemAtuador}")
+                data = f"{mensagemAtuador}\n"
+                self.save_data({"Lâmpada": self.encrypt_data(data)})
                 # with open("../log.txt", "a") as file:
                 #     file.write(f"Atuador: {mensagemAtuador}\n")
         elif comandoCliente == "on":
@@ -95,9 +95,9 @@ class Controller1(rpyc.Service):
                     self.save_data({"Sensor": self.encrypt_data(data)})
             elif message.topic == ATUADOR:
                 mensagemAtuador = message.payload.decode()
-                data = f"Atuador: {mensagemAtuador}"
-                self.save_data({"Atuador": self.encrypt_data(data)})
-                print(f"Atuador: {mensagemAtuador}")
+                data = f"{mensagemAtuador}"
+                self.save_data({"Lâmpada": self.encrypt_data(data)})
+                print(f"Lâmpada: {mensagemAtuador}")
 
         elif comandoCliente == "off":
             if message.topic == SENSOR:
@@ -110,13 +110,12 @@ class Controller1(rpyc.Service):
                     comandoCliente = ""
             elif message.topic == ATUADOR:
                 mensagemAtuador = message.payload.decode()
-                data = f"Atuador: {mensagemAtuador}\n"
-                self.save_data({"Atuador": self.encrypt_data(data)})
-                print(f"Atuador: {mensagemAtuador}")
+                data = f"{mensagemAtuador}\n"
+                self.save_data({"Lâmpada": self.encrypt_data(data)})
+                print(f"Lâmpada: {mensagemAtuador}")
     def exposed_ligar_desligar_lampada(self, comando):
         global comandoCliente
         comandoCliente = comando
-        print(f"Comando: {comandoCliente}")
 
     def exposed_conectar_mqtt(self): #Método que faz o controller se conectar ao broker
         self.broker.connect(MQTT_BROKER_HOST, MQTT_BROKER_PORT)
@@ -154,11 +153,8 @@ class Controller1(rpyc.Service):
                     # Descriptografar os dados usando a chave
                     fernet = Fernet(self.key)
                     valor_descriptografado = fernet.decrypt(valor_criptografado).decode()
-                    print("K: "+chave)
-                    print(valor_criptografado)
                     # Verificar se a chave está relacionada a um Sensor ou Atuador
-                    tipo = 'Sensor' if 'Sensor' in chave else 'Atuador'
-                # Adicionar à lista de resultados
+                    tipo = 'Sensor' if 'Sensor' in chave else 'Lâmpada'
                     value = tipo + ": " + valor_descriptografado
                     resultado.append(value)
 

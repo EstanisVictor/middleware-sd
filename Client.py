@@ -1,11 +1,35 @@
 import os
 import time
 import rpyc
+import subprocess
+import tkinter as tk
+from threading import Thread
+
+root = tk.Tk()
+
 class Client:
-    def __init__(self, name):
+    def __init__(self, name, master):
         self.proxy = None
         self.name = name
         self.id_client = None
+        self.master = master
+        self.master.title("OUTPUT")
+        self.output_text = tk.Text(master, wrap="word")
+        self.output_text.pack(expand=1, fill="both")
+        self.start_thread()
+    def start_thread(self):
+        self.thread = Thread(target=self.read_input, daemon=True)
+        self.thread.start()
+
+    def read_input(self):
+        while True:
+            for dado in client.monitorar():
+                self.update_output(dado)
+                print(dado)
+
+    def update_output(self, text):
+        self.output_text.insert(tk.END, text+"\n")
+        self.output_text.see(tk.END)
 
     def verifica_conexao_controller(self):
         return self.proxy.root.verifica_conexao_controller()
@@ -23,13 +47,22 @@ class Client:
     def monitorar(self):
         return self.proxy.root.monitorar()
 
+    def abrir_terminal(self):
+        comando = "echo 'Olá, mundo!'"
+        try:
+            # Executa o comando no terminal
+            subprocess.run(comando, shell=True, check=True)
+        except subprocess.CalledProcessError as e:
+            # Trata erros, se houver
+            print(f"Erro ao executar o comando: {e}")
+
 def menu(client: Client):
     # limpar_console()
     try:
         print(
             '1 - Monitorar o sistema'
-            '\n2 - Sair do chat'
-            '\n3 - Enviar mensagem'
+            '\n2 - Acender/Apagar manualmente a lâmpada'
+            '\n3 - Sair...'
         )
         print("=================================================")
         op = input('Digite uma dessas opções: ')
@@ -54,14 +87,16 @@ def main(client: Client):
                                     for dado in client.monitorar():
                                         print(dado)
                                     time.sleep(1)
+                                client.abrir_terminal()
                             except KeyboardInterrupt:
                                 pass
                         elif op == '2':
-                            print("Saindo do chat")
-                            break
-                        elif op == '3':
                             comando = input('Digite o comando: ')
                             client.ligar_desligar_lampada(comando)
+                        elif op == '3':
+                            print("Saindo...")
+                            time.sleep(2)
+                            break
                     except Exception as ex:
                         print(ex)
                         break
@@ -71,11 +106,13 @@ def main(client: Client):
         print(ex)
         exit(0)
 
-
+    root.mainloop()
 
 if __name__ == '__main__':
+
     name = input('Digite seu nome: ')
-    client = Client(name)
+    client = Client(name, root)
+
     client.join_system('localhost', 18850)
 
     main(client)

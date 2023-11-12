@@ -34,6 +34,9 @@ class Controller2(rpyc.Service):
         print(f'Conexão RPC recebida {conn}')
         self.conn = conn
 
+    def encrypt_data(self, data):
+        return Fernet(self.key).encrypt(data.encode())
+
     def exposed_join_system(self, name):
         user_id = uuid.uuid4()
         print(f' {user_id} Usuário {name} conectado')
@@ -68,9 +71,9 @@ class Controller2(rpyc.Service):
                     #     file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada\n")
             elif message.topic == ATUADOR:
                 mensagemAtuador = message.payload.decode()
-                print(f"Atuador: {mensagemAtuador}")
-                data = f"Atuador: {mensagemAtuador}\n"
-                self.save_data({"Atuador": self.encrypt_data(data)})
+                print(f"Lâmpada: {mensagemAtuador}")
+                data = f"{mensagemAtuador}\n"
+                self.save_data({"Lâmpada": self.encrypt_data(data)})
                 # with open("../log.txt", "a") as file:
                 #     file.write(f"Atuador: {mensagemAtuador}\n")
         elif comandoCliente == "on":
@@ -89,9 +92,9 @@ class Controller2(rpyc.Service):
                     self.save_data({"Sensor": self.encrypt_data(data)})
             elif message.topic == ATUADOR:
                 mensagemAtuador = message.payload.decode()
-                data = f"Atuador: {mensagemAtuador}"
-                self.save_data({"Atuador": self.encrypt_data(data)})
-                print(f"Atuador: {mensagemAtuador}")
+                data = f"{mensagemAtuador}"
+                self.save_data({"Lâmpada": self.encrypt_data(data)})
+                print(f"Lâmpada: {mensagemAtuador}")
 
         elif comandoCliente == "off":
             if message.topic == SENSOR:
@@ -104,35 +107,23 @@ class Controller2(rpyc.Service):
                     comandoCliente = ""
             elif message.topic == ATUADOR:
                 mensagemAtuador = message.payload.decode()
-                data = f"Atuador: {mensagemAtuador}\n"
-                self.save_data({"Atuador": self.encrypt_data(data)})
-                print(f"Atuador: {mensagemAtuador}")
-
-    def encrypt_data(self, data):
-        return Fernet(self.key).encrypt(data.encode())
+                data = f"{mensagemAtuador}\n"
+                self.save_data({"Lâmpada": self.encrypt_data(data)})
+                print(f"Lâmpada: {mensagemAtuador}")
 
     def exposed_ligar_desligar_lampada(self, comando):
         global comandoCliente
         comandoCliente = comando
-        print(f"Comando: {comandoCliente}")
 
-    def save_data(self, data):
-        try:
-            self.mongo_collection.insert_one(data)
-        except Exception as e:
-            print(f"Erro ao salvar no banco de dados: {e}")
-
-    def exposed_conectar_mqtt(self): #Método que faz o controller se conectar ao broker
+    def exposed_conectar_mqtt(self):  # Método que faz o controller se conectar ao broker
         self.broker.connect(MQTT_BROKER_HOST, MQTT_BROKER_PORT)
         self.start_mqtt_loop()
 
     def exposed_monitorar(self):
         dados_monitorados = self.obter_dados_monitorados()
         return dados_monitorados
-
-    def exposed_rpc_method(self, arg1, arg2):
-        # Lógica para operações RPC
-        pass
+        # with open("../log.txt", "r") as file:
+        #     return file.read()
 
     def start_mqtt_loop(self):
         self.broker.loop_start()
@@ -141,6 +132,12 @@ class Controller2(rpyc.Service):
         from rpyc.utils.server import ThreadedServer
         t = ThreadedServer(Controller2, port=18862)
         t.start()
+
+    def save_data(self, data):
+        try:
+            self.mongo_collection.insert_one(data)
+        except Exception as e:
+            print(f"Erro ao salvar no banco de dados: {e}")
 
     def obter_dados_monitorados(self):
         dados_monitorados = list(self.mongo_collection.find())
@@ -154,11 +151,8 @@ class Controller2(rpyc.Service):
                     # Descriptografar os dados usando a chave
                     fernet = Fernet(self.key)
                     valor_descriptografado = fernet.decrypt(valor_criptografado).decode()
-                    print("K: "+chave)
-                    print(valor_criptografado)
                     # Verificar se a chave está relacionada a um Sensor ou Atuador
-                    tipo = 'Sensor' if 'Sensor' in chave else 'Atuador'
-                # Adicionar à lista de resultados
+                    tipo = 'Sensor' if 'Sensor' in chave else 'Lâmpada'
                     value = tipo + ": " + valor_descriptografado
                     resultado.append(value)
 
