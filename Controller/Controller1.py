@@ -2,6 +2,9 @@ import time
 import uuid
 import paho.mqtt.client as mqtt
 import rpyc
+import os
+
+from pymongo import MongoClient
 
 MQTT_BROKER_HOST = "localhost"
 MQTT_BROKER_PORT = 1883
@@ -10,6 +13,11 @@ SENSOR = "/Sensor"
 ATUADOR = "/Atuador"
 comandoCliente = ""
 
+MONGO_HOST = os.environ.get("MONGO_URI")
+MONGO_NAME = "IOT"
+ATUADOR_COLLECTION = "INFO_ATUADOR"
+SENSOR_COLLECTION = "INFO_SENSOR"
+
 class Controller1(rpyc.Service):
     def __init__(self):
         self.broker = mqtt.Client()
@@ -17,6 +25,9 @@ class Controller1(rpyc.Service):
         self.broker.on_message = self.on_message_mqtt
         self.conn = None
         self.messageCLientMonitorar = None
+        self.mongo_cliente = MongoClient(MONGO_HOST)
+        self.mongo_db = self.mongo_cliente[MONGO_NAME]
+        self.mongo_collection = None
 
     def on_connect_rpc(self, conn):
         print(f'Conexão RPC recebida {conn}')
@@ -39,23 +50,27 @@ class Controller1(rpyc.Service):
         global comandoCliente
         if comandoCliente == "":
             if message.topic == SENSOR:
+                self.mongo_collection = self.mongo_db[SENSOR_COLLECTION]
                 mensagemSensor = message.payload.decode().split("/")
                 if int(mensagemSensor[1]) <= 40:
                     self.broker.publish(TOPIC_CONTROLLER, "on".encode())
                     print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada")
-                    with open("../log.txt", "a") as file:
-                        file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada\n")
+                    self.save_data({"SENSOR": f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada\n"})
+                    # with open("../log.txt", "a") as file:
+                    #     file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada\n")
                 else:
                     self.broker.publish(TOPIC_CONTROLLER, "off".encode())
                     print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada")
-                    with open("../log.txt", "a") as file:
-                        file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada\n")
+                    self.save_data({"SENSOR": f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada\n"})
+                    # with open("../log.txt", "a") as file:
+                    #     file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada\n")
             elif message.topic == ATUADOR:
+                self.mongo_collection = self.mongo_db[ATUADOR_COLLECTION]
                 mensagemAtuador = message.payload.decode()
                 print(f"Atuador: {mensagemAtuador}")
-                with open("../log.txt", "a") as file:
-                    file.write(f"Atuador: {mensagemAtuador}\n")
-
+                self.save_data({"ATUADOR": mensagemAtuador})
+                # with open("../log.txt", "a") as file:
+                #     file.write(f"Atuador: {mensagemAtuador}\n")
         elif comandoCliente == "on":
             if message.topic == SENSOR:
                 self.broker.publish(TOPIC_CONTROLLER, "on".encode())
@@ -100,6 +115,12 @@ class Controller1(rpyc.Service):
         from rpyc.utils.server import ThreadedServer
         t = ThreadedServer(Controller1, port=18861)
         t.start()
+
+    def save_data(self, data):
+        try:
+            self.mongo_collection.insert_one(data)
+        except Exception as e:
+            print(f"Erro ao salvar no banco de dados: {e}")
 
 if __name__ == '__main__':
     atuador = Controller1()
