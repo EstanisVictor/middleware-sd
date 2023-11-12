@@ -1,6 +1,6 @@
+import os
 import time
 import rpyc
-
 class Client:
     def __init__(self, name):
         self.proxy = None
@@ -51,11 +51,10 @@ def main(client: Client):
                             print("Precione CTRL+C para sair do monitoramento")
                             try:
                                 while True:
-                                    print(client.monitorar())
+                                    for dado in client.monitorar():
+                                        print(dado)
                                     time.sleep(1)
                             except KeyboardInterrupt:
-                                with open("log.txt", "w") as file:
-                                    file.write("")
                                 pass
                         elif op == '2':
                             print("Saindo do chat")
@@ -76,7 +75,6 @@ def main(client: Client):
 
 if __name__ == '__main__':
     name = input('Digite seu nome: ')
-
     client = Client(name)
     client.join_system('localhost', 18850)
 

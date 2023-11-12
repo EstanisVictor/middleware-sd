@@ -1,8 +1,8 @@
 from cryptography.fernet import Fernet
 
 class Crypto:
-    def __init__(self, data):
-        self.data = data
+    def __init__(self):
+        self.data = None
         #fazer a chave na parte dos controllers
         self.key = self.generate_key()
 

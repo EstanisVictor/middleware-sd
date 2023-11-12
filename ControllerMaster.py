@@ -1,11 +1,20 @@
+import os
 import socket
 import uuid
 import rpyc
+from pymongo import MongoClient
+from cryptography.fernet import Fernet
+from module import key
+
+MONGO_HOST = os.environ.get("MONGO_URI")
+MONGO_NAME = "IOT"
+DADOS = "DADOS"
 class ControllerMaster(rpyc.Service):
     def __init__(self):
         self.controllerPort = 18861
         self.proxy = None
         self.host = 'localhost'
+        self.key = key
 
     def exposed_join_system(self, name):
         user_id = uuid.uuid4()
@@ -38,7 +47,9 @@ class ControllerMaster(rpyc.Service):
         return self.proxy.root.monitorar()
 
     def exposed_monitorar(self): #Para responder ao cliente
-        return self.monitorar()
+        message = self.monitorar()
+        print(message)
+        return message
     def verifica_conexao_server(self, host, port):
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -50,8 +61,16 @@ class ControllerMaster(rpyc.Service):
     def conectar_mqtt(self): #Decide qual controller vai publicar e assinar os tópicos
         return self.proxy.root.conectar_mqtt()
 
+    # def descrypt_data(self, data):
+    #     return Fernet(self.key).decrypt(data).decode()
+
 if __name__ == '__main__':
     print("Iniciando Controller Master")
+    #Resetandio o banco de dados sempre que iniciar o master, para não houver superlotação
+    mongo_cliente = MongoClient(MONGO_HOST)
+    mongo_db = mongo_cliente[MONGO_NAME]
+    mongo_collection = mongo_db[DADOS]
+    mongo_collection.delete_many({})
     from rpyc.utils.server import ThreadedServer
     t = ThreadedServer(ControllerMaster, port=18850)
     t.start()

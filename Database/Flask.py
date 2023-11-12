@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import json
+import os
+
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from flask_cors import CORS
@@ -8,8 +10,8 @@ from bson.objectid import ObjectId
 
 app = Flask(__name__)
 CORS(app)
-
-client = MongoClient("mongodb+srv://estanis:estanis@cluster0.nsd3vad.mongodb.net/?retryWrites=true&w=majority")
+mongo_uri = os.environ.get("MONGO_URI")
+client = MongoClient(mongo_uri)
 db = client["IOT"]
 collection = db["INFO_ATUADOR"]
 
