@@ -48,7 +48,6 @@ class ControllerMaster(rpyc.Service):
 
     def exposed_monitorar(self): #Para responder ao cliente
         message = self.monitorar()
-        print(message)
         return message
     def verifica_conexao_server(self, host, port):
         try:

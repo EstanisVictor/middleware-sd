@@ -1,7 +1,6 @@
 import os
 import time
 import rpyc
-import subprocess
 import tkinter as tk
 from threading import Thread
 
@@ -13,23 +12,43 @@ class Client:
         self.name = name
         self.id_client = None
         self.master = master
-        self.master.title("OUTPUT")
+        self.master.title(self.name)
         self.output_text = tk.Text(master, wrap="word")
         self.output_text.pack(expand=1, fill="both")
-        self.start_thread()
+        self.stop_thread = False
+        self.changeController = False
+
     def start_thread(self):
         self.thread = Thread(target=self.read_input, daemon=True)
         self.thread.start()
 
     def read_input(self):
-        while True:
-            for dado in client.monitorar():
-                self.update_output(dado)
-                print(dado)
+        self.stop_thread = False
+        while not self.stop_thread:
+            dado = self.monitorar()
+
+            if self.changeController:
+                print("Controller desconectado")
+                root.quit()
+                return
+
+            if dado is not None:
+                if len(dado) == 1:
+                    self.update_output(dado)
+                else:
+                    for d in dado:
+                        self.update_output(d)
+            time.sleep(1)
+
+    def stop_thread_func(self):
+        self.stop_thread = True
 
     def update_output(self, text):
-        self.output_text.insert(tk.END, text+"\n")
-        self.output_text.see(tk.END)
+        try:
+            self.output_text.insert(tk.END, text+"\n")
+            self.output_text.see(tk.END)
+        except Exception as ex:
+            pass
 
     def verifica_conexao_controller(self):
         return self.proxy.root.verifica_conexao_controller()
@@ -45,19 +64,22 @@ class Client:
         return self.proxy.root.ligar_desligar_lampada(comando)
 
     def monitorar(self):
-        return self.proxy.root.monitorar()
-
-    def abrir_terminal(self):
-        comando = "echo 'Olá, mundo!'"
+        vetor = []
         try:
-            # Executa o comando no terminal
-            subprocess.run(comando, shell=True, check=True)
-        except subprocess.CalledProcessError as e:
-            # Trata erros, se houver
-            print(f"Erro ao executar o comando: {e}")
+            vetor = self.proxy.root.monitorar()
+        except Exception as ex:
+            self.stop_thread_func()
+            self.changeController = True
+            return vetor
+
+        if len(vetor) == 1:
+            return [vetor[-1]]
+        elif len(vetor) > 1:
+            return vetor[-2:]
+        else:
+            return vetor
 
 def menu(client: Client):
-    # limpar_console()
     try:
         print(
             '1 - Monitorar o sistema'
@@ -83,12 +105,13 @@ def main(client: Client):
                         if op == '1':
                             print("Precione CTRL+C para sair do monitoramento")
                             try:
-                                while True:
-                                    for dado in client.monitorar():
-                                        print(dado)
-                                    time.sleep(1)
-                                client.abrir_terminal()
+                                client.start_thread()
+                                root.mainloop()
+                            except Exception as ex:
+                                print(ex)
+                                break
                             except KeyboardInterrupt:
+                                client.stop_thread_func()
                                 pass
                         elif op == '2':
                             comando = input('Digite o comando: ')
@@ -96,17 +119,26 @@ def main(client: Client):
                         elif op == '3':
                             print("Saindo...")
                             time.sleep(2)
-                            break
+                            exit(0)
                     except Exception as ex:
                         print(ex)
                         break
+
+                    if client.changeController:
+                        client.changeController = False
+                        root.quit()
+                        client.master = tk.Tk()
+                        client.master.title(client.name)
+                        print("Mudando de controller")
+                        break
         print("Controller não está disponível")
+    except KeyboardInterrupt:
+        exit(0)
     except Exception as ex:
         print("Controller não está disponível")
         print(ex)
         exit(0)
 
-    root.mainloop()
 
 if __name__ == '__main__':
 
