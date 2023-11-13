@@ -128,8 +128,6 @@ def main(client: Client):
                     if client.changeController:
                         client.changeController = False
                         root.quit()
-                        client.master = tk.Tk()
-                        client.master.title(client.name)
                         print("Mudando de controller")
                         break
         print("Controller não está disponível")
