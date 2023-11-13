@@ -38,7 +38,7 @@ class SensorLuminosidade:
                 self.luminosidade -= 5
 
             self.hora += 1
-            time.sleep(2)
+            time.sleep(1.5)
 
     def assinar_luminosidade(self):
         self.broker.subscribe(TOPIC_SENSOR)

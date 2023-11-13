@@ -66,6 +66,7 @@ class Client:
     def monitorar(self):
         vetor = []
         try:
+            time.sleep(0.5)
             vetor = self.proxy.root.monitorar()
         except Exception as ex:
             self.stop_thread_func()

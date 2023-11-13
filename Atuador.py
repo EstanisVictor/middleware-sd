@@ -30,12 +30,6 @@ class AtuadorLampada:
             mensagem = "desligada"
             self.broker.publish(MQTT_TOPIC_ATUADOR, mensagem.encode())
 
-    def ligar_desligar_lampada(self):
-        mensagem = ""
-        while True:
-            time.sleep(3)
-
-
 if __name__ == '__main__':
     atuador = AtuadorLampada()
     atuador.broker.on_connect = atuador.on_connect
