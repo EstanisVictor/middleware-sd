@@ -1,4 +1,3 @@
-import json
 import uuid
 import paho.mqtt.client as mqtt
 import rpyc
@@ -20,6 +19,7 @@ comandoCliente = ""
 MONGO_HOST = os.environ.get("MONGO_URI")
 MONGO_NAME = "IOT"
 DADOS_COLLECTION = "DADOS"
+
 
 class Controller1(rpyc.Service):
     def __init__(self):
@@ -60,25 +60,21 @@ class Controller1(rpyc.Service):
                 mensagemSensor = message.payload.decode().split("/")
                 if int(mensagemSensor[1]) <= 40:
                     self.broker.publish(TOPIC_CONTROLLER, "on".encode())
-                    print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada")
-                    data = f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada"
+                    print(
+                        f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada")
+                    data = f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}%"
                     self.save_data({"Sensor": self.encrypt_data(data)})
-                    # with open("../log.txt", "a") as file:
-                    #     file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada\n")
                 else:
                     self.broker.publish(TOPIC_CONTROLLER, "off".encode())
-                    print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada")
-                    data = f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada"
+                    print(
+                        f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada")
+                    data = f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}%"
                     self.save_data({"Sensor": self.encrypt_data(data)})
-                    # with open("../log.txt", "a") as file:
-                    #     file.write(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada\n")
             elif message.topic == ATUADOR:
                 mensagemAtuador = message.payload.decode()
                 print(f"Lâmpada: {mensagemAtuador}")
                 data = f"{mensagemAtuador}\n"
                 self.save_data({"Lâmpada": self.encrypt_data(data)})
-                # with open("../log.txt", "a") as file:
-                #     file.write(f"Atuador: {mensagemAtuador}\n")
         elif comandoCliente == "on":
             if message.topic == SENSOR:
                 self.broker.publish(TOPIC_CONTROLLER, "on".encode())
@@ -86,12 +82,14 @@ class Controller1(rpyc.Service):
                 if int(mensagemSensor[1]) == 100:
                     comandoCliente = ""
                     self.broker.publish(TOPIC_CONTROLLER, "off".encode())
-                    print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada")
-                    data = f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada"
+                    print(
+                        f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada")
+                    data = f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}%"
                     self.save_data({"Sensor": self.encrypt_data(data)})
                 else:
-                    print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada")
-                    data = f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada"
+                    print(
+                        f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% ligada")
+                    data = f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}%"
                     self.save_data({"Sensor": self.encrypt_data(data)})
             elif message.topic == ATUADOR:
                 mensagemAtuador = message.payload.decode()
@@ -103,8 +101,9 @@ class Controller1(rpyc.Service):
             if message.topic == SENSOR:
                 self.broker.publish(TOPIC_CONTROLLER, "off".encode())
                 mensagemSensor = message.payload.decode().split("/")
-                print(f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada")
-                data = f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada"
+                print(
+                    f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}% desligada")
+                data = f"Hora: {mensagemSensor[0]} | Luminosidade: {mensagemSensor[1]}%"
                 self.save_data({"Sensor": self.encrypt_data(data)})
                 if int(mensagemSensor[1]) == 35:
                     comandoCliente = ""
@@ -113,19 +112,23 @@ class Controller1(rpyc.Service):
                 data = f"{mensagemAtuador}\n"
                 self.save_data({"Lâmpada": self.encrypt_data(data)})
                 print(f"Lâmpada: {mensagemAtuador}")
+
     def exposed_ligar_desligar_lampada(self, comando):
         global comandoCliente
         comandoCliente = comando
 
-    def exposed_conectar_mqtt(self): #Método que faz o controller se conectar ao broker
+    # Método que faz o controller se conectar ao broker
+    def exposed_conectar_mqtt(self):
         self.broker.connect(MQTT_BROKER_HOST, MQTT_BROKER_PORT)
         self.start_mqtt_loop()
 
     def exposed_monitorar(self):
-        dados_monitorados = self.obter_dados_monitorados()
-        return dados_monitorados
-        # with open("../log.txt", "r") as file:
-        #     return file.read()
+        dados = list(self.mongo_collection.find({'$or': [{'Sensor': {'$exists': True}}, {'Lâmpada': {'$exists': True}}]}, {'_id': 0}))
+        retorna = []
+        for documento in dados:
+            for chave, valor in documento.items():
+                retorna.append(documento[chave])
+        return retorna
 
     def start_mqtt_loop(self):
         self.broker.loop_start()
@@ -140,25 +143,6 @@ class Controller1(rpyc.Service):
             self.mongo_collection.insert_one(data)
         except Exception as e:
             print(f"Erro ao salvar no banco de dados: {e}")
-
-    def obter_dados_monitorados(self):
-        dados_monitorados = list(self.mongo_collection.find())
-        resultado = []
-
-        for documento in dados_monitorados:
-            for chave, valor_criptografado in documento.items():
-                if chave == '_id':
-                    pass
-                else:
-                    # Descriptografar os dados usando a chave
-                    fernet = Fernet(self.key)
-                    valor_descriptografado = fernet.decrypt(valor_criptografado).decode()
-                    # Verificar se a chave está relacionada a um Sensor ou Atuador
-                    tipo = 'Sensor' if 'Sensor' in chave else 'Lâmpada'
-                    value = tipo + ": " + valor_descriptografado
-                    resultado.append(value)
-
-        return resultado
 
 if __name__ == '__main__':
     atuador = Controller1()

@@ -1,10 +1,13 @@
-import os
 import time
 import rpyc
 import tkinter as tk
 from threading import Thread
 
+from cryptography.fernet import Fernet
+from module import key
+
 root = tk.Tk()
+
 
 class Client:
     def __init__(self, name, master):
@@ -17,6 +20,21 @@ class Client:
         self.output_text.pack(expand=1, fill="both")
         self.stop_thread = False
         self.changeController = False
+        self.key = key
+
+    def obter_dados_monitorados(self, dados_monitorados):
+        resultado = []
+        for criptografado in dados_monitorados:
+            fernet = Fernet(self.key)
+            valor_descriptografado = fernet.decrypt(criptografado).decode()
+            if valor_descriptografado.find("Hora"):
+                pattern = "Lâmpada: " + valor_descriptografado
+                resultado.append(pattern)
+            else:
+                pattern = "Sensor: " + valor_descriptografado
+                resultado.append(pattern)
+
+        return resultado
 
     def start_thread(self):
         self.thread = Thread(target=self.read_input, daemon=True)
@@ -25,7 +43,7 @@ class Client:
     def read_input(self):
         self.stop_thread = False
         while not self.stop_thread:
-            dado = self.monitorar()
+            dado = self.obter_dados_monitorados(self.monitorar())
 
             if self.changeController:
                 print("Controller desconectado")
@@ -45,7 +63,7 @@ class Client:
 
     def update_output(self, text):
         try:
-            self.output_text.insert(tk.END, text+"\n")
+            self.output_text.insert(tk.END, text + "\n")
             self.output_text.see(tk.END)
         except Exception as ex:
             pass
@@ -67,18 +85,19 @@ class Client:
         vetor = []
         try:
             time.sleep(0.5)
-            vetor = self.proxy.root.monitorar()
+            return self.proxy.root.monitorar()
         except Exception as ex:
             self.stop_thread_func()
             self.changeController = True
             return vetor
 
-        if len(vetor) == 1:
-            return [vetor[-1]]
-        elif len(vetor) > 1:
-            return vetor[-2:]
-        else:
-            return vetor
+        # if len(vetor) == 1:
+        #     return [vetor[-1]]
+        # elif len(vetor) > 1:
+        #     return vetor[-2:]
+        # else:
+        return vetor
+
 
 def menu(client: Client):
     try:
@@ -140,7 +159,6 @@ def main(client: Client):
 
 
 if __name__ == '__main__':
-
     name = input('Digite seu nome: ')
     client = Client(name, root)
 

@@ -1,11 +1,10 @@
-import time
-
 import paho.mqtt.client as mqtt
 
 MQTT_BROKER_HOST = "localhost"
 MQTT_BROKER_PORT = 1883
 MQTT_TOPIC_ATUADOR = "/Atuador"
 TOPIC_CONTROLLER = "/Controller"
+
 
 class AtuadorLampada:
     def __init__(self):
@@ -29,6 +28,7 @@ class AtuadorLampada:
         elif self.messageController == "off":
             mensagem = "desligada"
             self.broker.publish(MQTT_TOPIC_ATUADOR, mensagem.encode())
+
 
 if __name__ == '__main__':
     atuador = AtuadorLampada()
